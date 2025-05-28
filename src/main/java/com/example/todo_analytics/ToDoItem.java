@@ -23,7 +23,6 @@ public class ToDoItem implements Serializable {
         this.title = title;
         this.label = label;
         this.isDone = isDone;
-        this.label = label;
     }
 
     public ToDoItem(Long id, String title, String label, boolean isDone) {
@@ -31,7 +30,6 @@ public class ToDoItem implements Serializable {
         this.title = title;
         this.label = label;
         this.isDone = isDone;
-        this.label = label;
     }
 
     public Long getId() {

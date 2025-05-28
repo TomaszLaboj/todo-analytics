@@ -23,8 +23,9 @@ public class KafkaProducerConfig {
     @Bean
     public ConsumerFactory<String, ToDoItem> consumerFactory() {
         Map<String, Object> configProps = new HashMap<>();
-//        configProps.put(JsonDeserializer.TYPE_MAPPINGS, "todoitem:com.example.todo_analytics.ToDoItem");
-        configProps.put(JsonDeserializer.TRUSTED_PACKAGES, "com.example.todo_analytics, com.tomasz_laboj.simplified_todo.repository");
+
+        configProps.put(ConsumerConfig.GROUP_ID_CONFIG, "todo-statistics");
+        configProps.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
 
         configProps.put(
                 ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,
@@ -34,7 +35,7 @@ public class KafkaProducerConfig {
                 StringDeserializer.class);
         configProps.put(
                 ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
-                JsonDeserializer.class);
+                "com.example.todo_analytics.CustomDeserializer");
         return new DefaultKafkaConsumerFactory<>(configProps);
     }
 
