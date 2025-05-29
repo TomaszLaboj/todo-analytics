@@ -1,10 +1,11 @@
-package com.example.todo_analytics;
+package com.example.todo_analytics.kafka;
 
 import java.util.Map;
 
 import org.apache.kafka.common.errors.SerializationException;
 import org.apache.kafka.common.serialization.Deserializer;
 
+import com.example.todo_analytics.ToDoItem;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class CustomDeserializer implements Deserializer<ToDoItem> {

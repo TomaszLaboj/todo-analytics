@@ -1,20 +1,17 @@
-package com.example.todo_analytics;
+package com.example.todo_analytics.kafka;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
-import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
-import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 
-import org.springframework.kafka.support.serializer.JsonDeserializer;
-import org.springframework.kafka.support.serializer.JsonSerializer;
+import com.example.todo_analytics.ToDoItem;
 
 
 @Configuration
@@ -35,7 +32,7 @@ public class KafkaProducerConfig {
                 StringDeserializer.class);
         configProps.put(
                 ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
-                "com.example.todo_analytics.CustomDeserializer");
+                "com.example.todo_analytics.kafka.CustomDeserializer");
         return new DefaultKafkaConsumerFactory<>(configProps);
     }
 

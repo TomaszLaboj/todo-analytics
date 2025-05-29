@@ -3,6 +3,8 @@ package com.example.todo_analytics;
 
 import java.io.Serializable;
 
+import com.example.todo_analytics.repository.TaskLabel;
+
 public class ToDoItem implements Serializable {
 
     public enum Label {
@@ -14,18 +16,18 @@ public class ToDoItem implements Serializable {
     public Long id;
 
     public String title;
-    public String label;
+    public TaskLabel label;
     public boolean isDone;
 
     protected ToDoItem() {}
 
-    public ToDoItem(String title, String label, boolean isDone) {
+    public ToDoItem(String title, TaskLabel label, boolean isDone) {
         this.title = title;
         this.label = label;
         this.isDone = isDone;
     }
 
-    public ToDoItem(Long id, String title, String label, boolean isDone) {
+    public ToDoItem(Long id, String title, TaskLabel label, boolean isDone) {
         this.id = id;
         this.title = title;
         this.label = label;
@@ -41,8 +43,8 @@ public class ToDoItem implements Serializable {
     }
     public void setTitle(String title) { this.title = title; };
 
-    public String getLabel() { return label; }
-    public void setLabel(String label) { this.label = label; }
+    public TaskLabel getLabel() { return label; }
+    public void setLabel(TaskLabel label) { this.label = label; }
 
     public boolean isDone() {return isDone;}
     public void setIsDone(boolean isDone) { this.isDone = isDone; }
