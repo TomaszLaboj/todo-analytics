@@ -12,6 +12,8 @@ import com.example.todo_analytics.ToDoItemUpdated;
 import com.example.todo_analytics.repository.StatsEntity;
 import com.example.todo_analytics.repository.StatsRepository;
 import com.example.todo_analytics.repository.TaskLabel;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Component
 public class KafkaConsumer {
@@ -23,27 +25,43 @@ public class KafkaConsumer {
         this.statsRepository = statsRepository;
     }
 
-    @KafkaListener(id = "created", groupId = "todo-statistics", topics = {"created"})
-    public StatsEntity listenCreated(ToDoItem in) {
+    ObjectMapper mapper = new ObjectMapper();
 
-        Optional<StatsEntity> statsEntity = statsRepository.findById(checkId(in.getLabel()));
+    @KafkaListener(id = "created", groupId = "todo-statistics", topics = {"created"})
+    public void listenCreated(String in) throws JsonProcessingException {
+        ToDoItem toDoItem = mapper.readValue(in, ToDoItem.class);
+        created(toDoItem);
+    }
+
+	@KafkaListener(id = "updated", groupId = "todo-statistics", topics = { "updated"})
+	public void listenUpdated(String in) throws JsonProcessingException {
+        ToDoItemUpdated toDoItemUpdated = mapper.readValue(in, ToDoItemUpdated.class);
+        ToDoItem original = toDoItemUpdated.original;
+        ToDoItem updated = toDoItemUpdated.updated;
+        if (original.getLabel() != updated.getLabel()) {
+            deleted(original);
+            created(updated);
+        }
+	};
+
+    @KafkaListener(id = "deleted", groupId = "todo-statistics", topics = {"deleted"})
+    public void listenDeleted(String in) throws JsonProcessingException {
+        ToDoItem toDoItem = mapper.readValue(in, ToDoItem.class);
+        deleted(toDoItem);
+    }
+
+    public StatsEntity created(ToDoItem toDoItem) {
+        Optional<StatsEntity> statsEntity = statsRepository.findById(checkId(toDoItem.getLabel()));
         if (statsEntity.isPresent()) {
             StatsEntity stats = statsEntity.get();
             stats.setTotalCount(stats.getTotalCount() + 1);
             return statsRepository.save(stats);
         }
         //default return seems to be not saving to db if the db is empty
-        return statsRepository.save(new StatsEntity(checkId(in.getLabel()),in.getLabel(),0,0)) ;
-    }
-
-	@KafkaListener(id = "updated", groupId = "todo-statistics", topics = { "updated"})
-	public void listenUpdated(ToDoItemUpdated in) {
-		System.out.println(in);
-	}
-
-    @KafkaListener(id = "deleted", groupId = "todo-statistics", topics = {"deleted"})
-    public StatsEntity listenDeleted(ToDoItem in) {
-        Optional<StatsEntity> statsEntity = statsRepository.findById(checkId(in.getLabel()));
+        return statsRepository.save(new StatsEntity(checkId(toDoItem.getLabel()),toDoItem.getLabel(),0,0)) ;
+    };
+    public StatsEntity deleted(ToDoItem toDoItem) {
+        Optional<StatsEntity> statsEntity = statsRepository.findById(checkId(toDoItem.getLabel()));
         if (statsEntity.isPresent()) {
             StatsEntity stats = statsEntity.get();
             if (stats.getTotalCount() > 0) {
@@ -52,7 +70,7 @@ public class KafkaConsumer {
             return statsRepository.save(stats);
         }
         return null;
-    }
+    };
 
     Long checkId(TaskLabel label) {
         Long id = 1L;

@@ -11,14 +11,12 @@ import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 
-import com.example.todo_analytics.ToDoItem;
-
 
 @Configuration
-public class KafkaProducerConfig {
+public class KafkaConsumerConfig {
 
     @Bean
-    public ConsumerFactory<String, ToDoItem> consumerFactory() {
+    public ConsumerFactory<String, String> consumerFactory() {
         Map<String, Object> configProps = new HashMap<>();
 
         configProps.put(ConsumerConfig.GROUP_ID_CONFIG, "todo-statistics");
@@ -32,13 +30,13 @@ public class KafkaProducerConfig {
                 StringDeserializer.class);
         configProps.put(
                 ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
-                "com.example.todo_analytics.kafka.CustomDeserializer");
+                StringDeserializer.class);
         return new DefaultKafkaConsumerFactory<>(configProps);
     }
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, ToDoItem> kafkaListenerContainerFactory() {
-        ConcurrentKafkaListenerContainerFactory<String, ToDoItem> factory = new ConcurrentKafkaListenerContainerFactory<>();
+    public ConcurrentKafkaListenerContainerFactory<String, String> kafkaListenerContainerFactory() {
+        ConcurrentKafkaListenerContainerFactory<String, String> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory());
         return factory;
     }
